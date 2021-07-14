@@ -1,20 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { v4 as uuid_v4 } from "uuid";
+import api from '../api/contacts';
 import Header from "./Header";
 import AddContact from "./AddContact";
 import ContactList from "./ContactList";
+import ContactDetails from "./ContactDetail";
+import EditContact from "./EditContact";
 
 
 function App() {
     const LOCAL_STORAGE_KEY = "contacts";
     const [contacts, setContacts] = useState([]);
 
-    const addContactHandler = (contact) => {
+    //Retrieve Contacts
+    const retrieveContacts = async() => {
+      const response = await api.get("/contacts");
+      return response.data;
+    }
+
+    const addContactHandler = async (contact) => {
       console.log(contact);
-      setContacts([...contacts, {id:uuid_v4(), ...contact }]);
+      const request = {
+        id:uuid_v4(),
+        ...contact
+      }
+      const response = await api.post("/contacts", request)
+      setContacts([...contacts, response.data ]);
     };
 
-    const removeContactHandler = (id) => {
+    const updateContactHandler = () => {};
+
+    const removeContactHandler =  async (id) => {
+      await api.delete(`/contacts/${id}`);
       const newContactList = contacts.filter((contact) => {
         return contact.id !== id;
       });
@@ -22,12 +40,18 @@ function App() {
     }
  
     useEffect(() => {
-     const retriveContacts= JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
-      if(retriveContacts) setContacts(retriveContacts);
+    //  const retriveContacts= JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    //   if(retriveContacts) setContacts(retriveContacts);
+    const getAllContacts = async () => {
+      const allCOntacts = await retrieveContacts();
+      if(allCOntacts) setContacts(allCOntacts);
+    };
+      getAllContacts();
     }, []);
 
     useEffect(() => {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+      // localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+
     }, [contacts]);
 
   // const contacts = [
@@ -43,10 +67,27 @@ function App() {
   //   }
   // ]
   return (
-  <div className="container w-4/5">
+  <div className="container w-3/5">
+    <Router>
     <Header />
-    <AddContact addContactHandler={addContactHandler} />
-    <ContactList contacts={contacts} getContactId={removeContactHandler} />
+    <Switch>
+      <Route path="/" exact render={(props) => (<ContactList {...props} 
+      contacts={contacts} getContactId={removeContactHandler} /> 
+      )} />
+      <Route path="/add" render={(props) => (
+        <AddContact {...props} addContactHandler={addContactHandler} />
+      )} />
+
+       <Route path="/edit" render={(props) => (
+        <EditContact {...props} updateContactHandler={updateContactHandler} />
+      )} />
+
+
+      <Route path="/contact/:id" component={ContactDetails} />
+    </Switch>
+    {/* <AddContact addContactHandler={addContactHandler} />
+    <ContactList contacts={contacts} getContactId={removeContactHandler} /> */}
+    </Router>
   </div>
   );
 }
