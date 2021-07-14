@@ -11,10 +11,6 @@ class EditContact extends React.Component {
             email,
         }
     }
-    state = {
-        name: "",
-        email: ""
-    };
 
     update = (e) => {
         e.preventDefault();
@@ -29,7 +25,7 @@ class EditContact extends React.Component {
     };
     render() {
         return (
-            <div>
+            <div className="w-80">
                 <h2 className="block text-gray-700 text-l  font-bold mb-2 pl-4">Update Contact</h2>
                 <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={this.update}>
                     <div className="mb-4">
