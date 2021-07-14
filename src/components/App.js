@@ -10,7 +10,7 @@ import EditContact from "./EditContact";
 
 
 function App() {
-    const LOCAL_STORAGE_KEY = "contacts";
+
     const [contacts, setContacts] = useState([]);
 
     //Retrieve Contacts
@@ -25,11 +25,18 @@ function App() {
         id:uuid_v4(),
         ...contact
       }
-      const response = await api.post("/contacts", request)
+      const response = await api.post("/contacts", request);
       setContacts([...contacts, response.data ]);
     };
 
-    const updateContactHandler = () => {};
+    const updateContactHandler = async (contact) => {
+      const response = await api.put(`/contacts/${contact.id}`, contact)
+      const { id, name, email} = response.data;
+      setContacts(contacts.map((contact) => {
+          return contact.id === id ? {...response.data} : contact;
+      })
+      );
+    };
 
     const removeContactHandler =  async (id) => {
       await api.delete(`/contacts/${id}`);
@@ -40,8 +47,6 @@ function App() {
     }
  
     useEffect(() => {
-    //  const retriveContacts= JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
-    //   if(retriveContacts) setContacts(retriveContacts);
     const getAllContacts = async () => {
       const allCOntacts = await retrieveContacts();
       if(allCOntacts) setContacts(allCOntacts);
@@ -49,25 +54,8 @@ function App() {
       getAllContacts();
     }, []);
 
-    useEffect(() => {
-      // localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
-
-    }, [contacts]);
-
-  // const contacts = [
-  //   {
-  //     id: "1",
-  //     "name": "Geo",
-  //     "email": "fgeovic@gmail.com"
-  //   },
-  //   {
-  //     id: "2",
-  //     "name": "Izaiah",
-  //     "email": "Izaiah@gmail.com"
-  //   }
-  // ]
   return (
-  <div className="container w-3/5">
+  <div className="container w-full">
     <Router>
     <Header />
     <Switch>
@@ -85,8 +73,7 @@ function App() {
 
       <Route path="/contact/:id" component={ContactDetails} />
     </Switch>
-    {/* <AddContact addContactHandler={addContactHandler} />
-    <ContactList contacts={contacts} getContactId={removeContactHandler} /> */}
+
     </Router>
   </div>
   );
