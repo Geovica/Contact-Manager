@@ -1,0 +1,49 @@
+{
+  "contacts": [
+    {
+      "id": "98f11f47-243f-4801-b1f4-e965c151c60e",
+      "name": "bert Fagel123",
+      "email": "bert@gmail.com"
+    },
+    {
+      "id": "0b7b1a5b-df3a-4465-92d1-38e251998db0",
+      "name": "John Doe",
+      "email": "john@gmail.com"
+    },
+    {
+      "id": "b4d91191-67fd-496b-8ecf-7c918f848a01",
+      "name": "Geovic Fagel456",
+      "email": "geovic@yahoo.com"
+    },
+    {
+      "id": "86a737af-61f9-418d-b2a6-7f423df5bad2",
+      "name": "Kean",
+      "email": "kean02@yahoo.com"
+    },
+    {
+      "id": "4ad69add-bfd1-474f-90cc-1b18c80c0ab3",
+      "name": "zeo zoo",
+      "email": "zeo@yahoo.com"
+    },
+    {
+      "id": "2804caa6-1d83-4922-a29d-2aeed03c3359",
+      "name": "abaka egahada",
+      "email": "abakada@gmail.com"
+    },
+    {
+      "id": "42765667-84f3-43ac-b5b1-105816575489",
+      "name": "xander ford",
+      "email": "xander@yahoo.com"
+    },
+    {
+      "id": "8b86f902-4ad2-4d8c-838b-78e5b34dcb06",
+      "name": "mark",
+      "email": "mark@microsoft.com"
+    },
+    {
+      "id": "4f2dec15-9618-4899-a970-577108acb0e9",
+      "name": "abs",
+      "email": "abs@gmail.com"
+    }
+  ]
+}
