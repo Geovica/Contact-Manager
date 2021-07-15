@@ -11,71 +11,90 @@ import EditContact from "./EditContact";
 
 function App() {
 
-    const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  //Retrieve Contacts
+  const retrieveContacts = async () => {
+    const response = await api.get("/contacts");
+    return response.data;
+  }
 
-    //Retrieve Contacts
-    const retrieveContacts = async() => {
-      const response = await api.get("/contacts");
-      return response.data;
+  const addContactHandler = async (contact) => {
+    console.log(contact);
+    const request = {
+      id: uuid_v4(),
+      ...contact
     }
+    const response = await api.post("/contacts", request);
+    setContacts([...contacts, response.data]);
+  };
 
-    const addContactHandler = async (contact) => {
-      console.log(contact);
-      const request = {
-        id:uuid_v4(),
-        ...contact
-      }
-      const response = await api.post("/contacts", request);
-      setContacts([...contacts, response.data ]);
-    };
+  const updateContactHandler = async (contact) => {
+    const response = await api.put(`/contacts/${contact.id}`, contact)
+    const { id, name, email } = response.data;
+    setContacts(contacts.map((contact) => {
+      return contact.id === id ? { ...response.data } : contact;
+    })
+    );
+  };
 
-    const updateContactHandler = async (contact) => {
-      const response = await api.put(`/contacts/${contact.id}`, contact)
-      const { id, name, email} = response.data;
-      setContacts(contacts.map((contact) => {
-          return contact.id === id ? {...response.data} : contact;
-      })
-      );
-    };
+  const removeContactHandler = async (id) => {
+    await api.delete(`/contacts/${id}`);
+    const newContactList = contacts.filter((contact) => {
+      return contact.id !== id;
+    });
+    setContacts(newContactList);
+  };
 
-    const removeContactHandler =  async (id) => {
-      await api.delete(`/contacts/${id}`);
+  const searchHandler = (searchTerm) => {
+    setSearchTerm(searchTerm);
+    if (searchTerm !== "") {
       const newContactList = contacts.filter((contact) => {
-        return contact.id !== id;
-      });
-      setContacts(newContactList);
+       return Object.values(contact).join(" ")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      })
+        setSearchResults(newContactList);
     }
- 
-    useEffect(() => {
+    else {
+        setSearchResults(contacts);
+    }
+  };
+  useEffect(() => {
     const getAllContacts = async () => {
       const allCOntacts = await retrieveContacts();
-      if(allCOntacts) setContacts(allCOntacts);
+      if (allCOntacts) setContacts(allCOntacts);
     };
-      getAllContacts();
-    }, []);
+    getAllContacts();
+  }, []);
 
   return (
-  <div className="container w-full">
-    <Router>
-    <Header />
-    <Switch>
-      <Route path="/" exact render={(props) => (<ContactList {...props} 
-      contacts={contacts} getContactId={removeContactHandler} /> 
-      )} />
-      <Route path="/add" render={(props) => (
-        <AddContact {...props} addContactHandler={addContactHandler} />
-      )} />
+    <div className="container w-full">
+      <Router>
+        <Header />
+        <Switch>
+          <Route path="/" exact render={(props) => (
+            <ContactList {...props}
+              contacts={ searchTerm.length < 1 ? contacts : searchResults } getContactId={removeContactHandler}
+              term={searchTerm}
+              searchKeyword={searchHandler}
+            />
+          )} />
+          <Route path="/add" render={(props) => (
+            <AddContact {...props} addContactHandler={addContactHandler} />
+          )} />
 
-       <Route path="/edit" render={(props) => (
-        <EditContact {...props} updateContactHandler={updateContactHandler} />
-      )} />
+          <Route path="/edit" render={(props) => (
+            <EditContact {...props} updateContactHandler={updateContactHandler} />
+          )} />
 
 
-      <Route path="/contact/:id" component={ContactDetails} />
-    </Switch>
+          <Route path="/contact/:id" component={ContactDetails} />
+        </Switch>
 
-    </Router>
-  </div>
+      </Router>
+    </div>
   );
 }
 
